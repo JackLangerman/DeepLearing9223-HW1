@@ -1,4 +1,8 @@
 .DS_Store
+
+# Data
 HW1-data.tar
 cifar10-hw1
+
+# Jupyter Notebook
 .ipynb_checkpoints
