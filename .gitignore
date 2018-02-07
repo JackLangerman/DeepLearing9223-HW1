@@ -1,4 +1,6 @@
+
 .DS_Store
 HW1-data.tar
 # Jupyter Notebook
 .ipynb_checkpoints
+ans1-uni.npy
