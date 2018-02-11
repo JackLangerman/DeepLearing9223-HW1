@@ -121,6 +121,7 @@ class NeuralNetwork(object):
                 NN_input[str(i+1)], cache_tem = self.affineForward(NN_input[str(i)],self.params['W'+str(i+1)],self.params['b'+str(i+1)])
                 if (i+1) != self.num_layers:
                     NN_input[str(i+1)], cache2 = self.relu_forward(NN_input[str(i+1)])
+                    
                 cache[str(i+1)]=(NN_input[str(i)],cache_tem[1],cache_tem[2])
         AL=NN_input[str(self.num_layers)]
         return (AL, cache)
@@ -177,6 +178,7 @@ class NeuralNetwork(object):
 
         
     def relu_derivative(self, dx, cached_x):
+        # print(cached)
         dout=dx
         dout[cached_x<0]=0
         return dout
@@ -201,7 +203,7 @@ class NeuralNetwork(object):
         #gradients['b'+str(self.num_layers)] = db_last
         for i in range(self.num_layers,0,-1):
             if i != 1:
-                dA, dW, db=self.affineBackward(dAL,cache[str(i)])
+                dA, dW, db = self.affineBackward(dAL,cache[str(i)])
                 dAL = self.activationBackward(dA, cache[str(i)][0])
             else:
                 dAL, dW, db=self.affineBackward(dAL,cache[str(i)])
@@ -454,6 +456,20 @@ alpha = float(sys.argv[1])
 
 layer_dimensions = [X_train.shape[0], 2048, 2048, 1024, 512, 10]  # including the input and output layers
 NN = NeuralNetwork(layer_dimensions,drop_prob=0.0, reg_lambda=0)
+
+f = lambda w : NN.costFunction(NN.forwardPropagation(X_train)[0], y_train)
+
+# def f(w):
+#     AL, cache = NN.forwardPropagation(X_train)
+#     loss, dAL = NN.costFunction(AL, y_train)
+#     return loss
+
+AL, cache = NN.forwardPropagation(X_train)
+loss, dAL = NN.costFunction(AL, X_train)
+gradients_analytic = NN.backPropagation( dAL, y_train, cache)
+
+grad_check_sparse(f(NN.params['W1']), gradients_analytic['W1'], 100)
+
 NN.train(X_train, y_train, X_val,y_val,iters=10000, alpha=alpha, batch_size=128, print_every=100,decay_rate=0.95)
 
 
